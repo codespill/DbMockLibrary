@@ -1,21 +1,28 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace DbMockLibrary\Test\DbImplementations\Mongo;
 
 use DbMockLibrary\DbImplementations\Mongo;
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
 use DbMockLibrary\Test\TestCase;
+use MongoDB\Exception\InvalidArgumentException;
+use ReflectionClass;
+use ReflectionException;
 
 class ResetDataTest extends TestCase
 {
     /**
      * @return void
+     * @throws AlreadyInitializedException
+     * @throws InvalidArgumentException
+     * @throws ReflectionException
      */
-    public function test_function()
+    public function test_function(): void
     {
         // prepare
         $dataArray = ['foo' => 1];
         Mongo::initMongo($dataArray, 'fooBar', []);
-        $reflection = new \ReflectionClass('\DbMockLibrary\DbImplementations\Mongo');
+        $reflection = new ReflectionClass(Mongo::class);
         $staticProperties = $reflection->getStaticProperties();
         $dataProperty = $reflection->getProperty('data');
         $dataProperty->setAccessible(true);

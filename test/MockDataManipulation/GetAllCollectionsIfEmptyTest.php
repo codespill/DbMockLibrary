@@ -1,8 +1,12 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\MockDataManipulation;
 
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
 use DbMockLibrary\MockDataManipulation;
 use DbMockLibrary\Test\TestCase;
+use ReflectionClass;
+use ReflectionException;
 
 class GetAllCollectionsIfEmptyTest extends TestCase
 {
@@ -12,12 +16,14 @@ class GetAllCollectionsIfEmptyTest extends TestCase
      * @param array $data
      *
      * @return void
+     * @throws AlreadyInitializedException
+     * @throws ReflectionException
      */
-    public function test_function(array $data)
+    public function test_function(array $data): void
     {
         // prepare
         MockDataManipulation::initDataContainer(['collection1' => [], 'collection2' => []]);
-        $reflection                     = new \ReflectionClass('\DbMockLibrary\MockDataManipulation');
+        $reflection = new ReflectionClass(MockDataManipulation::class);
         $getAllCollectionsIfEmptyMethod = $reflection->getMethod('getAllCollectionsIfEmpty');
         $getAllCollectionsIfEmptyMethod->setAccessible(true);
 
@@ -31,21 +37,21 @@ class GetAllCollectionsIfEmptyTest extends TestCase
     /**
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return [
             // #0 not empty
             [
                 [
                     'collections' => ['collection1'],
-                    'expected'    => ['collection1']
+                    'expected' => ['collection1']
                 ]
             ],
             // #1 empty
             [
                 [
                     'collections' => [],
-                    'expected'    => ['collection1', 'collection2']
+                    'expected' => ['collection1', 'collection2']
                 ]
             ]
         ];

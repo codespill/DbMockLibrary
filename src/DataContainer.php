@@ -1,31 +1,30 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace DbMockLibrary;
 
-use DbMockLibrary\Exceptions\InvalidDependencyException;
 use DbMockLibrary\Exceptions\AlreadyInitializedException;
-use UnexpectedValueException;
 use InvalidArgumentException;
+use UnexpectedValueException;
 
 class DataContainer extends Base
 {
     /**
      * @var array $data
      */
-    protected $data;
+    protected array $data;
 
     /**
      * @var array $initialData
      */
-    protected static $initialData;
+    protected static array $initialData;
 
     /**
      * @param array $initialData
      *
+     * @return void
      * @throws AlreadyInitializedException
-     * @throws InvalidDependencyException
      */
-    public static function initDataContainer(array $initialData)
+    public static function initDataContainer(array $initialData): void
     {
         static::init();
         static::$instance->data = static::$initialData = $initialData;
@@ -36,7 +35,7 @@ class DataContainer extends Base
      *
      * @return void
      */
-    public function resetData()
+    public function resetData(): void
     {
         // clear all changes to $data array
         $this->data = static::$initialData;
@@ -48,7 +47,7 @@ class DataContainer extends Base
      * @return void
      * @throws UnexpectedValueException
      */
-    protected function validateCollections(array $collections)
+    protected function validateCollections(array $collections): void
     {
         foreach ($collections as $collection) {
             if (!isset($this->data[$collection]) || !array_key_exists($collection, $this->data)) {
@@ -59,13 +58,13 @@ class DataContainer extends Base
 
     /**
      * @param string $collection
-     * @param array  $ids
+     * @param array $ids
      *
      * @return void
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
-    protected function validateIds($collection, array $ids)
+    protected function validateIds(string $collection, array $ids): void
     {
         $this->validateCollections([$collection]);
 

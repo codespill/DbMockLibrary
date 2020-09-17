@@ -1,23 +1,30 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\DbImplementations\Mongo;
 
 use DbMockLibrary\DbImplementations\Mongo;
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
 use DbMockLibrary\Test\TestCase;
-use MongoClient;
+use MongoDB;
+use MongoDB\Client;
+use MongoDB\Exception\InvalidArgumentException;
+use MongoDB\Exception\UnsupportedException;
+use ReflectionClass;
+use ReflectionException;
 
 class InsertTest extends TestCase
 {
-    /**
-     * @var \MongoDB $database
-     */
-    protected $database;
+    protected MongoDB\Database $database;
 
-    public function setUp()
+    /**
+     * @return void
+     * @throws AlreadyInitializedException
+     * @throws InvalidArgumentException
+     * @throws UnsupportedException
+     */
+    protected function setUp(): void
     {
-        if (is_null($this->database)) {
-            $client = new MongoClient();
-            $this->database = $client->selectDB('DbMockLibraryTest');
-        }
+        $this->database ??= (new Client())->selectDatabase('DbMockLibraryTest');
 
         $this->database->dropCollection('testCollection');
         $this->database->createCollection('testCollection');
@@ -25,7 +32,12 @@ class InsertTest extends TestCase
         Mongo::initMongo(['testCollection' => [1 => ['foo' => 0, '_id' => 0]]], 'DbMockLibraryTest', []);
     }
 
-    public function tearDown()
+    /**
+     * @return void
+     * @throws InvalidArgumentException
+     * @throws UnsupportedException
+     */
+    protected function tearDown(): void
     {
         $this->database->dropCollection('testCollection');
         $this->database->drop();
@@ -37,13 +49,16 @@ class InsertTest extends TestCase
 
     /**
      * @return void
+     * @throws InvalidArgumentException
+     * @throws UnsupportedException
+     * @throws ReflectionException
      */
-    public function test_function()
+    public function test_function(): void
     {
         // prepare
         $testCollection = $this->database->selectCollection('testCollection');
         $result = iterator_to_array($testCollection->find(['_id' => 0]));
-        $reflection = new \ReflectionClass(Mongo::getInstance());
+        $reflection = new ReflectionClass(Mongo::getInstance());
         $insertMethod = $reflection->getMethod('insert');
         $insertMethod->setAccessible(true);
 

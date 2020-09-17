@@ -1,15 +1,21 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\DependencyHandler;
 
 use DbMockLibrary\DependencyHandler;
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
 use DbMockLibrary\Test\TestCase;
+use ReflectionClass;
+use ReflectionException;
 
 class CompactDependenciesTest extends TestCase
 {
     /**
      * @return void
+     * @throws AlreadyInitializedException
+     * @throws ReflectionException
      */
-    public function test_function()
+    public function test_function(): void
     {
         // prepare
         $repacked = [
@@ -42,7 +48,7 @@ class CompactDependenciesTest extends TestCase
             ['a' => ['a1']]
         ];
         DependencyHandler::initDependencyHandler([]);
-        $reflection         = new \ReflectionClass('\DbMockLibrary\DependencyHandler');
+        $reflection = new ReflectionClass(DependencyHandler::class);
         $dependenciesMethod = $reflection->getMethod('compactDependencies');
         $dependenciesMethod->setAccessible(true);
 

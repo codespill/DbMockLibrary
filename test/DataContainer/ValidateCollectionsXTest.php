@@ -1,20 +1,28 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\DataContainer;
 
 use DbMockLibrary\DataContainer;
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
 use DbMockLibrary\Test\TestCase;
+use ReflectionClass;
+use ReflectionException;
+use UnexpectedValueException;
 
 class ValidateCollectionsXTest extends TestCase
 {
     /**
      * @return void
+     * @throws AlreadyInitializedException
+     * @throws ReflectionException
      */
-    public function test_function()
+    public function test_function(): void
     {
         // prepare
-        $this->setExpectedException('\UnexpectedValueException', 'Collection \'fooBar\' does not exist');
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Collection \'fooBar\' does not exist');
         DataContainer::initDataContainer(['collection' => []]);
-        $reflection = new \ReflectionClass(DataContainer::getInstance());
+        $reflection = new ReflectionClass(DataContainer::getInstance());
         $validateCollectionsMethod = $reflection->getMethod('validateCollections');
         $validateCollectionsMethod->setAccessible(true);
 

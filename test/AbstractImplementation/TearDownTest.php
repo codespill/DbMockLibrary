@@ -1,16 +1,21 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\AbstractImplementation;
 
 use DbMockLibrary\MockMethodCalls;
+use ReflectionException;
 
 class TearDownTest extends FakeTestCase
 {
     /**
      * @dataProvider getData
      *
+     * @param array $data
+     *
      * @return void
+     * @throws ReflectionException
      */
-    public function test_function(array $data)
+    public function test_function(array $data): void
     {
         // prepare
         $this->setPropertyByReflection($this->fake, 'data', $data['data']);
@@ -21,14 +26,17 @@ class TearDownTest extends FakeTestCase
         // test
         foreach ($data['arguments'] as $key => $arguments) {
             $this->assertEquals(1, MockMethodCalls::getInstance()->wasCalledCount(
-                'DbMockLibrary\Test\AbstractImplementation\FakeImplementation',
+                FakeImplementation::class,
                 'delete',
                 $arguments
             ));
         }
     }
 
-    public function getData()
+    /**
+     * @return array
+     */
+    public function getData(): array
     {
         return [
             // #0 delete everything

@@ -1,7 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace DbMockLibrary;
 
+use Exception;
 use UnexpectedValueException;
 
 class MockMethodCalls extends Base
@@ -9,28 +10,29 @@ class MockMethodCalls extends Base
     /**
      * @var array $callArguments
      */
-    protected $callArguments = [];
+    protected array $callArguments = [];
 
     /**
      * @var array $traces
      */
-    protected $traces = [];
+    protected array $traces = [];
 
     /**
-     * @param string $class
+     * @param $class
      * @param string $method
-     * @param array  $arguments
+     * @param array|null $arguments
      *
-     * @return bool
+     * @return int
      */
-    public function wasCalledCount($class, $method, array $arguments = null)
+    public function wasCalledCount($class, string $method, array $arguments = null): int
     {
-        $traces  = $this->getFullTraceDetails($class, $method);
+        $traces = $this->getFullTraceDetails($class, $method);
         $counter = 0;
 
         foreach ($traces as $trace) {
             foreach ($trace as $calls) {
-                if ($calls['function'] == $method && $calls['class'] == $class && (is_null($arguments) || $calls['args'] == $arguments)) {
+                if ($calls['function'] == $method && $calls['class'] == $class && (is_null($arguments) ||
+                        (isset($calls['args']) && $calls['args'] == $arguments))) {
                     $counter++;
                 }
             }
@@ -40,13 +42,13 @@ class MockMethodCalls extends Base
     }
 
     /**
-     * @param string $object
+     * @param $object
      * @param string $method
-     * @param array  $arguments
+     * @param array $arguments
      *
-     * @return array
+     * @return void
      */
-    public function recordArguments($object, $method, array $arguments)
+    public function recordArguments($object, string $method, array $arguments): void
     {
         if (!method_exists($object, $method)) {
             throw new UnexpectedValueException('Invalid method');
@@ -58,11 +60,11 @@ class MockMethodCalls extends Base
     /**
      * @return void
      */
-    public function recordTrace()
+    public function recordTrace(): void
     {
         try {
-            throw new \Exception();
-        } catch (\Exception $e) {
+            throw new Exception();
+        } catch (Exception $e) {
             $tmp = $e->getTrace();
             array_shift($tmp);
             $this->traces[] = $tmp;
@@ -70,12 +72,12 @@ class MockMethodCalls extends Base
     }
 
     /**
-     * @param string $class
+     * @param $class
      * @param string $method
      *
      * @return array
      */
-    protected function getFullTraceDetails($class, $method)
+    protected function getFullTraceDetails($class, string $method): array
     {
         if (!method_exists($class, $method)) {
             throw new UnexpectedValueException('Invalid method');
@@ -84,7 +86,7 @@ class MockMethodCalls extends Base
         $return = [];
         // iterate through recorded traces
         foreach ($this->traces as $trace) {
-            $save       = false;
+            $save = false;
             $usefulData = [];
             // iterate through calls withing every trace
             foreach ($trace as $calls) {
@@ -95,8 +97,8 @@ class MockMethodCalls extends Base
                 // prepare trace as if it was going to be returned...
                 $usefulData[] = [
                     'function' => $calls['function'],
-                    'class'    => $calls['class'],
-                    'args'     => $calls['args'],
+                    'class' => $calls['class'],
+                    'args' => $calls['args'],
                 ];
             }
             // ... but only return it if needed

@@ -1,21 +1,25 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\DbImplementations\MySQL;
 
 use DbMockLibrary\DbImplementations\MySQL;
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
+use DbMockLibrary\Exceptions\InvalidDependencyException;
 use DbMockLibrary\Test\TestCase;
+use PDO;
+use ReflectionException;
+use UnexpectedValueException;
 
-class InitXTest extends TestCase
+class InitMySQLXTest extends TestCase
 {
-    /**
-     * @var \PDO $pdo
-     */
-    protected $pdo;
+    protected PDO $pdo;
 
-    public function setUp()
+    /**
+     * @return void
+     */
+    protected function setUp(): void
     {
-        if (is_null($this->pdo)) {
-            $this->pdo = new \PDO('mysql:host=localhost;', 'root', '');
-        }
+        $this->pdo ??= new PDO('mysql:host=127.0.0.1;', 'root', '');
 
         $stmt = $this->pdo->prepare('DROP DATABASE IF EXISTS `DbMockLibraryTest`');
         $stmt->execute();
@@ -27,7 +31,11 @@ class InitXTest extends TestCase
         $stmt->execute();
     }
 
-    public function tearDown()
+    /**
+     * @return void
+     * @throws ReflectionException
+     */
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -41,146 +49,102 @@ class InitXTest extends TestCase
      * @param array $data
      *
      * @return void
+     * @throws AlreadyInitializedException
+     * @throws InvalidDependencyException
      */
-    public function test_function(array $data)
+    public function test_function(array $data): void
     {
         // prepare
-        $this->setExpectedException($data['exception'], $data['errorMessage']);
+        $this->expectException($data['exception']);
+        $this->expectExceptionMessage($data['errorMessage']);
 
         // invoke logic
-        MySQL::initMySQL($data['initialData'], $data['serverName'], $data['database'], $data['username'], $data['password'], []);
+        MySQL::initMySQL($data['initialData'], $data['serverName'], $data['database'], $data['username'],
+            $data['password'], []);
         if (isset($data['initTwice'])) {
-            MySQL::initMySQL($data['initialData'], $data['serverName'], $data['database'], $data['username'], $data['password'], []);
+            MySQL::initMySQL($data['initialData'], $data['serverName'], $data['database'], $data['username'],
+                $data['password'], []);
         }
     }
 
     /**
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return [
             // #0 instance already initialized
             [
                 [
-                    'exception'    => '\DbMockLibrary\Exceptions\AlreadyInitializedException',
+                    'exception' => AlreadyInitializedException::class,
                     'errorMessage' => 'MySQL library already initialized',
-                    'serverName'   => 'localhost',
-                    'database'     => 'DbMockLibraryTest',
-                    'username'     => 'root',
-                    'password'     => '',
-                    'initialData'  => [],
-                    'initTwice'    => true
+                    'serverName' => '127.0.0.1',
+                    'database' => 'DbMockLibraryTest',
+                    'username' => 'root',
+                    'password' => '',
+                    'initialData' => [],
+                    'initTwice' => true
                 ]
             ],
             // #1 invalid server name parameter
             [
                 [
-                    'exception'    => '\UnexpectedValueException',
+                    'exception' => UnexpectedValueException::class,
                     'errorMessage' => 'Invalid server name',
-                    'serverName'   => '',
-                    'database'     => 'DbMockLibraryTest',
-                    'username'     => 'root',
-                    'password'     => '',
-                    'initialData'  => []
+                    'serverName' => '',
+                    'database' => 'DbMockLibraryTest',
+                    'username' => 'root',
+                    'password' => '',
+                    'initialData' => []
                 ]
             ],
-            // #2 invalid server name parameter
+            // #2 invalid database parameter
             [
                 [
-                    'exception'    => '\UnexpectedValueException',
-                    'errorMessage' => 'Invalid server name',
-                    'serverName'   => [],
-                    'database'     => 'DbMockLibraryTest',
-                    'username'     => 'root',
-                    'password'     => '',
-                    'initialData'  => []
-                ]
-            ],
-            // #3 invalid database parameter
-            [
-                [
-                    'exception'    => '\UnexpectedValueException',
+                    'exception' => UnexpectedValueException::class,
                     'errorMessage' => 'Invalid database name',
-                    'serverName'   => 'localhost',
-                    'database'     => '',
-                    'username'     => 'root',
-                    'password'     => '',
-                    'initialData'  => []
+                    'serverName' => '127.0.0.1',
+                    'database' => '',
+                    'username' => 'root',
+                    'password' => '',
+                    'initialData' => []
                 ]
             ],
-            // #4 invalid database parameter
+            // #3 invalid username parameter
             [
                 [
-                    'exception'    => '\UnexpectedValueException',
-                    'errorMessage' => 'Invalid database name',
-                    'serverName'   => 'localhost',
-                    'database'     => [],
-                    'username'     => 'root',
-                    'password'     => '',
-                    'initialData'  => []
-                ]
-            ],
-            // #5 invalid username parameter
-            [
-                [
-                    'exception'    => '\UnexpectedValueException',
+                    'exception' => UnexpectedValueException::class,
                     'errorMessage' => 'Invalid username',
-                    'serverName'   => 'localhost',
-                    'database'     => 'DbMockLibraryTest',
-                    'username'     => '',
-                    'password'     => '',
-                    'initialData'  => []
+                    'serverName' => '127.0.0.1',
+                    'database' => 'DbMockLibraryTest',
+                    'username' => '',
+                    'password' => '',
+                    'initialData' => []
 
                 ]
             ],
-            // #6 invalid username parameter
+            // #4 invalid table names (not a string) in initial data parameter
             [
                 [
-                    'exception'    => '\UnexpectedValueException',
-                    'errorMessage' => 'Invalid username',
-                    'serverName'   => 'localhost',
-                    'database'     => 'DbMockLibraryTest',
-                    'username'     => [],
-                    'password'     => '',
-                    'initialData'  => []
-
-                ]
-            ],
-            // #7 invalid password parameter
-            [
-                [
-                    'exception'    => '\UnexpectedValueException',
-                    'errorMessage' => 'Invalid password',
-                    'serverName'   => 'localhost',
-                    'database'     => 'DbMockLibraryTest',
-                    'username'     => 'root',
-                    'password'     => [],
-                    'initialData'  => []
-                ]
-            ],
-            // #8 invalid table names (not a string) in initial data parameter
-            [
-                [
-                    'exception'    => '\UnexpectedValueException',
+                    'exception' => UnexpectedValueException::class,
                     'errorMessage' => 'Invalid table names',
-                    'serverName'   => 'localhost',
-                    'database'     => 'DbMockLibraryTest',
-                    'username'     => 'root',
-                    'password'     => '',
-                    'initialData'  => [1 => ['foo' => 'value', 'id' => 1]]
+                    'serverName' => '127.0.0.1',
+                    'database' => 'DbMockLibraryTest',
+                    'username' => 'root',
+                    'password' => '',
+                    'initialData' => [1 => ['foo' => 'value', 'id' => 1]]
                 ]
             ],
-            // #9 missing (part or whole) primary key in initial data
+            // #5 missing (part or whole) primary key in initial data
             [
                 [
-                    'exception'    => '\UnexpectedValueException',
+                    'exception' => UnexpectedValueException::class,
                     'errorMessage' => 'Missing keys in initial data for table: testTable',
-                    'serverName'   => 'localhost',
-                    'database'     => 'DbMockLibraryTest',
-                    'username'     => 'root',
-                    'password'     => '',
-                    'initialData'  => ['testTable' => [1 => ['foo' => 1]]]
+                    'serverName' => '127.0.0.1',
+                    'database' => 'DbMockLibraryTest',
+                    'username' => 'root',
+                    'password' => '',
+                    'initialData' => ['testTable' => [1 => ['foo' => 1]]]
                 ]
             ]
         ];

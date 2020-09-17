@@ -1,14 +1,20 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\AbstractImplementation;
+
+use ReflectionException;
 
 class RecordInsertTest extends FakeTestCase
 {
     /**
      * @dataProvider getData
      *
+     * @param array $data
+     *
      * @return void
+     * @throws ReflectionException
      */
-    public function test_function(array $data)
+    public function test_function(array $data): void
     {
         // prepare
         $this->setPropertyByReflection($this->fake, 'insertedIntoDb', $data['insertedIntoDb']);
@@ -20,7 +26,10 @@ class RecordInsertTest extends FakeTestCase
         $this->assertEquals($data['expected'], $this->getPropertyByReflection($this->fake, 'insertedIntoDb'));
     }
 
-    public function getData()
+    /**
+     * @return array
+     */
+    public function getData(): array
     {
         return [
             // #0 already recorded

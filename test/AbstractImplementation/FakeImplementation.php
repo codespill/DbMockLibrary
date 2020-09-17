@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\AbstractImplementation;
 
 use DbMockLibrary\AbstractImplementation;
@@ -12,9 +13,9 @@ class FakeImplementation extends AbstractImplementation
      * @param string $collection
      * @param string $id
      *
-     * @return mixed
+     * @return void
      */
-    protected function insert($collection, $id)
+    protected function insert(string $collection, string $id): void
     {
         MockMethodCalls::getInstance()->recordTrace();
     }
@@ -27,7 +28,7 @@ class FakeImplementation extends AbstractImplementation
      *
      * @return void
      */
-    protected function delete($collection, $id)
+    protected function delete(string $collection, string $id): void
     {
         MockMethodCalls::getInstance()->recordTrace();
     }

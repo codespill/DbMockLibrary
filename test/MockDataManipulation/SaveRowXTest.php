@@ -1,8 +1,11 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\MockDataManipulation;
 
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
 use DbMockLibrary\MockDataManipulation;
 use DbMockLibrary\Test\TestCase;
+use UnexpectedValueException;
 
 class SaveRowXTest extends TestCase
 {
@@ -12,11 +15,13 @@ class SaveRowXTest extends TestCase
      * @param array $data
      *
      * @return void
+     * @throws AlreadyInitializedException
      */
-    public function test_function(array $data)
+    public function test_function(array $data): void
     {
         // prepare
-        $this->setExpectedException($data['exception'], $data['message']);
+        $this->expectException($data['exception']);
+        $this->expectExceptionMessage($data['message']);
         MockDataManipulation::initDataContainer(['collection' => ['id' => ['field' => 'value']]]);
 
         // invoke logic & test
@@ -26,19 +31,19 @@ class SaveRowXTest extends TestCase
     /**
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return [
             // #0 field is a row, so value should be array
             [
                 [
-                    'value'      => 'value',
+                    'value' => 'value',
                     'collection' => 'collection',
-                    'id'         => 'id',
-                    'field'      => '',
-                    'strict'     => false,
-                    'exception'  => '\UnexpectedValueException',
-                    'message'    => 'Row should be an array of fields'
+                    'id' => 'id',
+                    'field' => '',
+                    'strict' => false,
+                    'exception' => UnexpectedValueException::class,
+                    'message' => 'Row should be an array of fields'
                 ]
             ]
         ];

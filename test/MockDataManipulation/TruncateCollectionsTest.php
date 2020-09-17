@@ -1,8 +1,12 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\MockDataManipulation;
 
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
 use DbMockLibrary\MockDataManipulation;
 use DbMockLibrary\Test\TestCase;
+use ReflectionClass;
+use ReflectionException;
 
 class TruncateCollectionsTest extends TestCase
 {
@@ -12,12 +16,17 @@ class TruncateCollectionsTest extends TestCase
      * @param array $data
      *
      * @return void
+     * @throws AlreadyInitializedException
+     * @throws ReflectionException
      */
-    public function test_function(array $data)
+    public function test_function(array $data): void
     {
         // prepare
-        MockDataManipulation::initDataContainer(['collection1' => ['id1' => [1], 'id2' => [2]], 'collection2' => ['id3' => [1], 'id4' => [2]]]);
-        $reflection = new \ReflectionClass('\DbMockLibrary\MockDataManipulation');
+        MockDataManipulation::initDataContainer([
+            'collection1' => ['id1' => [1], 'id2' => [2]],
+            'collection2' => ['id3' => [1], 'id4' => [2]]
+        ]);
+        $reflection = new ReflectionClass(MockDataManipulation::class);
         $dataProperty = $reflection->getProperty('data');
         $dataProperty->setAccessible(true);
 
@@ -31,21 +40,21 @@ class TruncateCollectionsTest extends TestCase
     /**
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return [
             // #0 truncate selected collections
             [
                 [
-                    'collections'  => ['collection1'],
-                    'expected'     => ['collection1' => [], 'collection2' => ['id3' => [1], 'id4' => [2]]]
+                    'collections' => ['collection1'],
+                    'expected' => ['collection1' => [], 'collection2' => ['id3' => [1], 'id4' => [2]]]
                 ]
             ],
             // #1 truncate all collections
             [
                 [
-                    'collections'  => [],
-                    'expected'     => ['collection1' => [], 'collection2' => []]
+                    'collections' => [],
+                    'expected' => ['collection1' => [], 'collection2' => []]
                 ]
             ]
         ];

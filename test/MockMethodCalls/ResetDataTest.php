@@ -1,22 +1,27 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace DbMockLibrary\Test\MockMethodCalls;
 
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
 use DbMockLibrary\MockMethodCalls;
 use DbMockLibrary\Test\TestCase;
+use ReflectionClass;
+use ReflectionException;
 
 class ResetDataTest extends TestCase
 {
     /**
      * @return void
+     * @throws AlreadyInitializedException
+     * @throws ReflectionException
      */
-    public function test_function()
+    public function test_function(): void
     {
         // prepare
         $traces = ['foo' => 1];
         $callArguments = ['bar' => 1];
         MockMethodCalls::init();
-        $reflection = new \ReflectionClass('\DbMockLibrary\MockMethodCalls');
+        $reflection = new ReflectionClass(MockMethodCalls::class);
         $staticProperties = $reflection->getStaticProperties();
         $tracesProperty = $reflection->getProperty('traces');
         $tracesProperty->setAccessible(true);

@@ -1,28 +1,30 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace DbMockLibrary;
 
-use DbMockLibrary\Exceptions\InvalidDependencyException;
 use DbMockLibrary\Exceptions\AlreadyInitializedException;
 use UnexpectedValueException;
 
 class Base
 {
     /**
-     * @var static $instance
+     * @var ?object $instance
      */
-    protected static $instance;
+    protected static ?object $instance = null;
 
+    /**
+     * Base constructor.
+     */
     protected function __construct()
     {
     }
 
     /**
      * @return void
+     *
      * @throws AlreadyInitializedException
-     * @throws InvalidDependencyException
      */
-    public static function init()
+    public static function init(): void
     {
         if (!static::$instance) {
             static::$instance = new static();
@@ -34,16 +36,15 @@ class Base
     /**
      * @return void
      */
-    public static function destroy()
+    public static function destroy(): void
     {
         static::$instance = null;
     }
 
     /**
-     * @throws UnexpectedValueException
-     * @return static
+     * @return ?object
      */
-    public static function getInstance()
+    public static function getInstance(): ?object
     {
         if (empty(static::$instance)) {
             throw new UnexpectedValueException('Not initialized');

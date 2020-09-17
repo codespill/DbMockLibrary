@@ -1,14 +1,17 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\AbstractImplementation;
 
 use DbMockLibrary\MockMethodCalls;
+use ReflectionException;
 
 class CleanUpTest extends FakeTestCase
 {
     /**
      * @return void
+     * @throws ReflectionException
      */
-    public function test_function()
+    public function test_function(): void
     {
         // prepare
         $insertedIntoDb = [['collection1' => 'id1'], ['collection2' => 'id2']];
@@ -19,12 +22,12 @@ class CleanUpTest extends FakeTestCase
 
         // test
         $this->assertEquals(1, MockMethodCalls::getInstance()->wasCalledCount(
-            'DbMockLibrary\Test\AbstractImplementation\FakeImplementation',
+            FakeImplementation::class,
             'delete',
             ['collection1', 'id1']
         ));
         $this->assertEquals(1, MockMethodCalls::getInstance()->wasCalledCount(
-            'DbMockLibrary\Test\AbstractImplementation\FakeImplementation',
+            FakeImplementation::class,
             'delete',
             ['collection2', 'id2']
         ));

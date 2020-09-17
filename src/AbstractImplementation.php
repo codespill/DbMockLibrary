@@ -1,15 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace DbMockLibrary;
 
 use SimpleArrayLibrary\SimpleArrayLibrary;
+use UnexpectedValueException;
 
 abstract class AbstractImplementation extends DependencyHandler
 {
     /**
      * @var array $insertedIntoDb
      */
-    protected $insertedIntoDb = [];
+    protected array $insertedIntoDb = [];
 
     /**
      * Fill some or all collections with dummy data
@@ -18,7 +19,7 @@ abstract class AbstractImplementation extends DependencyHandler
      *
      * @return void
      */
-    public function setUp(array $records = [])
+    public function setUp(array $records = []): void
     {
         if (empty($records)) {
             foreach ($this->data as $collection => $rows) {
@@ -60,10 +61,10 @@ abstract class AbstractImplementation extends DependencyHandler
      *
      * @param array $records
      *
-     * @throws \UnexpectedValueException
      * @return void
+     * @throws UnexpectedValueException
      */
-    public function tearDown(array $records = [])
+    public function tearDown(array $records = []): void
     {
         if (empty($records)) {
             foreach ($this->data as $collection => $rows) {
@@ -96,9 +97,9 @@ abstract class AbstractImplementation extends DependencyHandler
      * @param string $collection
      * @param string $id
      *
-     * @return mixed
+     * @return void
      */
-    abstract protected function insert($collection, $id);
+    abstract protected function insert(string $collection, string $id): void;
 
     /**
      * Delete from database
@@ -108,7 +109,7 @@ abstract class AbstractImplementation extends DependencyHandler
      *
      * @return void
      */
-    abstract protected function delete($collection, $id);
+    abstract protected function delete(string $collection, string $id): void;
 
     /**
      * @param string $collection
@@ -116,7 +117,7 @@ abstract class AbstractImplementation extends DependencyHandler
      *
      * @return void
      */
-    protected function recordInsert($collection, $id)
+    protected function recordInsert(string $collection, string $id): void
     {
         if (!in_array([$collection => $id], $this->insertedIntoDb)) {
             $this->insertedIntoDb[] = [$collection => $id];
@@ -126,7 +127,7 @@ abstract class AbstractImplementation extends DependencyHandler
     /**
      * @return void
      */
-    public function cleanUp()
+    public function cleanUp(): void
     {
         $reverseOrder = array_reverse($this->insertedIntoDb);
         for ($i = 0; $i < count($reverseOrder); $i++) {

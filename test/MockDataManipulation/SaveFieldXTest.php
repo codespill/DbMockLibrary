@@ -1,8 +1,11 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\MockDataManipulation;
 
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
 use DbMockLibrary\MockDataManipulation;
 use DbMockLibrary\Test\TestCase;
+use UnexpectedValueException;
 
 class SaveFieldXTest extends TestCase
 {
@@ -12,43 +15,50 @@ class SaveFieldXTest extends TestCase
      * @param array $data
      *
      * @return void
+     * @throws AlreadyInitializedException
      */
-    public function test_function(array $data)
+    public function test_function(array $data): void
     {
         // prepare
-        $this->setExpectedException($data['exception'], $data['message']);
+        $this->expectException($data['exception']);
+        $this->expectExceptionMessage($data['message']);
         MockDataManipulation::initDataContainer(['collection' => ['id' => ['field' => 'value']]]);
 
         // invoke logic & test
-        MockDataManipulation::getInstance()->saveField($data['value'], $data['collection'], $data['id'], $data['field']);
+        MockDataManipulation::getInstance()->saveField(
+            $data['value'],
+            $data['collection'],
+            $data['id'],
+            $data['field']
+        );
     }
 
     /**
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return [
             // #0 collection doesn't exist
             [
                 [
-                    'value'      => 'value',
+                    'value' => 'value',
                     'collection' => 'fooBar',
-                    'id'         => 'id',
-                    'field'      => 'field',
-                    'exception'  => '\UnexpectedValueException',
-                    'message'    => 'Non existing collection'
+                    'id' => 'id',
+                    'field' => 'field',
+                    'exception' => UnexpectedValueException::class,
+                    'message' => 'Non existing collection'
                 ]
             ],
             // #1 row doesn't exist
             [
                 [
-                    'value'      => 'value',
+                    'value' => 'value',
                     'collection' => 'collection',
-                    'id'         => 'fooBar',
-                    'field'      => 'field',
-                    'exception'  => '\UnexpectedValueException',
-                    'message'    => 'Non existing row'
+                    'id' => 'fooBar',
+                    'field' => 'field',
+                    'exception' => UnexpectedValueException::class,
+                    'message' => 'Non existing row'
                 ]
             ]
         ];

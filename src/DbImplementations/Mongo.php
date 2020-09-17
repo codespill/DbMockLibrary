@@ -1,40 +1,44 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace DbMockLibrary\DbImplementations;
 
+use DbMockLibrary\AbstractImplementation;
 use DbMockLibrary\Exceptions\AlreadyInitializedException;
 use DbMockLibrary\Exceptions\DbOperationFailedException;
-use DbMockLibrary\AbstractImplementation;
 use Exception;
 use MongoDB\Client;
+use MongoDB\Database;
+use MongoDB\Exception\InvalidArgumentException;
 use SimpleArrayLibrary\SimpleArrayLibrary;
 use UnexpectedValueException;
 
 class Mongo extends AbstractImplementation
 {
     /**
-     * @var static $instance
+     * @var ?object $instance
      */
-    protected static $instance;
+    protected static ?object $instance = null;
 
     /**
      * @var array $initialData
      */
-    protected static $initialData;
+    protected static array $initialData;
 
     /**
-     * @var \MongoDB $database
+     * @var Database $database
      */
-    protected $database;
+    protected Database $database;
 
     /**
-     * @param array  $initialData
+     * @param array $initialData
      * @param string $database
-     * @param array  $dependencies
+     * @param array $dependencies
      *
+     * @return void
      * @throws AlreadyInitializedException
+     * @throws InvalidArgumentException
      */
-    public static function initMongo(array $initialData, $database, array $dependencies)
+    public static function initMongo(array $initialData, string $database, array $dependencies): void
     {
         if (!static::$instance) {
             if (empty($database) || !is_string($database)) {
@@ -46,7 +50,7 @@ class Mongo extends AbstractImplementation
 
             static::$initialData = $initialData;
             static::initDependencyHandler($initialData, $dependencies);
-            $client                     = new Client();
+            $client = new Client();
             static::$instance->database = $client->selectDatabase($database);
         } else {
             throw new AlreadyInitializedException('Mongo library already initialized');
@@ -54,9 +58,9 @@ class Mongo extends AbstractImplementation
     }
 
     /**
-     * @return static
+     * @return ?object
      */
-    public static function getInstance()
+    public static function getInstance(): ?object
     {
         return static::$instance;
     }
@@ -70,15 +74,15 @@ class Mongo extends AbstractImplementation
      * @return void
      * @throws DbOperationFailedException
      */
-    protected function insert($collectionName, $id)
+    protected function insert(string $collectionName, string $id): void
     {
         $collection = static::$instance->database->selectCollection($collectionName);
         try {
-            $status = $collection->insert($this->data[$collectionName][$id], ['w' => 1]);
+            $status = $collection->insertOne($this->data[$collectionName][$id], ['w' => 1]);
         } catch (Exception $e) {
             throw new DbOperationFailedException('Insert failed');
         }
-        if (!empty($status['err'])) {
+        if ($status->getInsertedCount() !== 1) {
             throw new DbOperationFailedException('Insert failed');
         }
         $this->recordInsert($collectionName, $id);
@@ -93,15 +97,15 @@ class Mongo extends AbstractImplementation
      * @return void
      * @throws DbOperationFailedException
      */
-    protected function delete($collectionName, $id)
+    protected function delete(string $collectionName, string $id): void
     {
         $collection = static::$instance->database->selectCollection($collectionName);
         try {
-            $status = $collection->remove(['_id' => $this->data[$collectionName][$id]['_id']], ['w' => 1]);
+            $status = $collection->deleteOne(['_id' => $this->data[$collectionName][$id]['_id']], ['w' => 1]);
         } catch (Exception $e) {
             throw new DbOperationFailedException('Delete failed');
         }
-        if (!empty($status['err'])) {
+        if ($status->getDeletedCount() !== 1) {
             throw new DbOperationFailedException('Delete failed');
         }
     }

@@ -1,21 +1,27 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\DbImplementations\MySQL;
 
 use DbMockLibrary\DbImplementations\MySQL;
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
+use DbMockLibrary\Exceptions\InvalidDependencyException;
 use DbMockLibrary\Test\TestCase;
+use PDO;
+use ReflectionClass;
+use ReflectionException;
 
 class InsertTest extends TestCase
 {
-    /**
-     * @var \PDO $pdo
-     */
-    protected $pdo;
+    protected PDO $pdo;
 
-    public function setUp()
+    /**
+     * @return void
+     * @throws AlreadyInitializedException
+     * @throws InvalidDependencyException
+     */
+    protected function setUp(): void
     {
-        if (is_null($this->pdo)) {
-            $this->pdo = new \PDO('mysql:host=localhost;', 'root', '');
-        }
+        $this->pdo ??= new PDO('mysql:host=127.0.0.1;', 'root', '');
 
         $stmt = $this->pdo->prepare('DROP DATABASE IF EXISTS `DbMockLibraryTest`');
         $stmt->execute();
@@ -26,10 +32,14 @@ class InsertTest extends TestCase
         $stmt = $this->pdo->prepare('CREATE TABLE IF NOT EXISTS DbMockLibraryTest.testTable (`id` INT, `foo` INT, PRIMARY KEY (`id`))');
         $stmt->execute();
 
-        MySQL::initMySQL(['testTable' => [1 => ['foo' => 0, 'id' => 0]]], 'localhost', 'DbMockLibraryTest', 'root', '', []);
+        MySQL::initMySQL(['testTable' => [1 => ['foo' => 0, 'id' => 0]]], '127.0.0.1', 'DbMockLibraryTest', 'root', '',
+            []);
     }
 
-    public function tearDown()
+    /**
+     * @return void
+     */
+    protected function tearDown(): void
     {
         $stmt = $this->pdo->prepare('DROP DATABASE IF EXISTS `DbMockLibraryTest`');
         $stmt->execute();
@@ -42,14 +52,15 @@ class InsertTest extends TestCase
 
     /**
      * @return void
+     * @throws ReflectionException
      */
-    public function test_function()
+    public function test_function(): void
     {
         // prepare
         $stmt = $this->pdo->prepare('SELECT * FROM `DbMockLibraryTest`.testTable WHERE `id` = 0');
         $stmt->execute();
         $result = $stmt->fetchAll();
-        $reflection = new \ReflectionClass(MySQL::getInstance());
+        $reflection = new ReflectionClass(MySQL::getInstance());
         $insertMethod = $reflection->getMethod('insert');
         $insertMethod->setAccessible(true);
 

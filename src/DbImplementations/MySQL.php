@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace DbMockLibrary\DbImplementations;
 
+use DbMockLibrary\AbstractImplementation;
 use DbMockLibrary\Exceptions\AlreadyInitializedException;
 use DbMockLibrary\Exceptions\DbOperationFailedException;
-use DbMockLibrary\AbstractImplementation;
 use PDO;
 use SimpleArrayLibrary\SimpleArrayLibrary;
 use UnexpectedValueException;
@@ -12,44 +12,48 @@ use UnexpectedValueException;
 class MySQL extends AbstractImplementation
 {
     /**
-     * @var static $instance
+     * @var ?object $instance
      */
-    protected static $instance;
+    protected static ?object $instance = null;
 
     /**
      * @var PDO $connection
      */
-    protected $connection;
+    protected PDO $connection;
 
     /**
      * @var array $primaryKeys
      */
-    protected $primaryKeys;
+    protected array $primaryKeys;
 
     /**
-     * @param array  $initialData
+     * @param array $initialData
      * @param string $serverName
      * @param string $database
      * @param string $username
      * @param string $password
-     * @param array  $dependencies
+     * @param array $dependencies
      *
+     * @return void
      * @throws AlreadyInitializedException
      */
-    public static function initMySQL(array $initialData, $serverName, $database, $username, $password, array $dependencies)
-    {
+    public static function initMySQL(
+        array $initialData,
+        string $serverName,
+        string $database,
+        string $username,
+        string $password,
+        array $dependencies
+    ): void {
         if (!static::$instance) {
-            if (empty($serverName) || !is_string($serverName)) {
+            if (empty($serverName)) {
                 throw new UnexpectedValueException('Invalid server name');
             }
-            if (empty($database) || !is_string($database)) {
+            if (empty($database)) {
                 throw new UnexpectedValueException('Invalid database name');
             }
-            if (empty($username) || !is_string($username)) {
+            if (empty($username)) {
                 throw new UnexpectedValueException('Invalid username');
-            }
-            if (!is_string($password)) {
-                throw new UnexpectedValueException('Invalid password');
             }
             if (!SimpleArrayLibrary::isAssociative($initialData) && !empty($initialData)) {
                 throw new UnexpectedValueException('Invalid table names');
@@ -57,8 +61,9 @@ class MySQL extends AbstractImplementation
 
             static::$initialData = $initialData;
             static::initDependencyHandler($initialData, $dependencies);
-            static::$instance->connection   = new PDO('mysql:host=' . $serverName . ';dbname=' . $database, $username, $password);
-            static::$instance->primaryKeys  = [];
+            static::$instance->connection = new PDO('mysql:host=' . $serverName . ';dbname=' . $database, $username,
+                $password);
+            static::$instance->primaryKeys = [];
             foreach ($initialData as $table => $data) {
                 $stmt = static::$instance->connection->prepare("SHOW KEYS FROM {$table} WHERE Key_name = 'PRIMARY'");
                 $stmt->execute();
@@ -86,17 +91,18 @@ class MySQL extends AbstractImplementation
      * @param string $collection
      * @param string $id
      *
-     * @throws DbOperationFailedException
      * @return void
+     * @throws DbOperationFailedException
      */
-    protected function insert($collection, $id)
+    protected function insert(string $collection, string $id): void
     {
-        $data    = $this->data[$collection][$id];
+        $data = $this->data[$collection][$id];
         $columns = array_map(function ($value) {
             return ':' . $value;
         }, array_keys($data));
-        $stmt    = $this->connection->prepare(
-            'INSERT INTO ' . $collection . ' (' . implode(', ', array_keys($data)) . ') VALUES (' . implode(', ', $columns) . ');'
+        $stmt = $this->connection->prepare(
+            'INSERT INTO ' . $collection . ' (' . implode(', ', array_keys($data)) . ') VALUES (' . implode(', ',
+                $columns) . ');'
         );
         if (!$stmt->execute($data)) {
             throw new DbOperationFailedException('Insert failed');
@@ -110,14 +116,14 @@ class MySQL extends AbstractImplementation
      * @param string $collection
      * @param string $id
      *
-     * @throws DbOperationFailedException
      * @return void
+     * @throws DbOperationFailedException
      */
-    protected function delete($collection, $id)
+    protected function delete(string $collection, string $id): void
     {
-        $query      = 'DELETE FROM ' . $collection . ' WHERE ';
+        $query = 'DELETE FROM ' . $collection . ' WHERE ';
         $conditions = [];
-        $values     = [];
+        $values = [];
         foreach ($this->primaryKeys[$collection] as $key) {
             $conditions[] = '`' . $key . '` = ' . ':' . $key;
             $values[$key] = $this->data[$collection][$id][$key];

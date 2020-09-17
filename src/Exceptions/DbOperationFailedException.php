@@ -1,5 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace DbMockLibrary\Exceptions;
 
-class DbOperationFailedException extends \Exception {}
+use Exception;
+
+class DbOperationFailedException extends Exception
+{
+}

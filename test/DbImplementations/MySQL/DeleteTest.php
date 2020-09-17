@@ -1,22 +1,27 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\DbImplementations\MySQL;
 
 use DbMockLibrary\DbImplementations\MySQL;
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
+use DbMockLibrary\Exceptions\InvalidDependencyException;
 use DbMockLibrary\Test\TestCase;
+use PDO;
 use ReflectionClass;
+use ReflectionException;
 
 class DeleteTest extends TestCase
 {
-    /**
-     * @var \PDO $pdo
-     */
-    protected $pdo;
+    protected PDO $pdo;
 
-    public function setUp()
+    /**
+     * @return void
+     * @throws AlreadyInitializedException
+     * @throws InvalidDependencyException
+     */
+    protected function setUp(): void
     {
-        if (is_null($this->pdo)) {
-            $this->pdo = new \PDO('mysql:host=localhost;', 'root', '');
-        }
+        $this->pdo ??= new PDO('mysql:host=127.0.0.1;', 'root', '');
 
         $stmt = $this->pdo->prepare('DROP DATABASE IF EXISTS `DbMockLibraryTest`');
         $stmt->execute();
@@ -30,10 +35,14 @@ class DeleteTest extends TestCase
         $stmt = $this->pdo->prepare('INSERT INTO DbMockLibraryTest.testTable (`id`, `foo`) VALUES (0, 0)');
         $stmt->execute();
 
-        MySQL::initMySQL(['testTable' => [1 => ['foo' => 0, 'id' => 0]]], 'localhost', 'DbMockLibraryTest', 'root', '', []);
+        MySQL::initMySQL(['testTable' => [1 => ['foo' => 0, 'id' => 0]]], '127.0.0.1', 'DbMockLibraryTest', 'root', '',
+            []);
     }
 
-    public function tearDown()
+    /**
+     * @return void
+     */
+    protected function tearDown(): void
     {
         $stmt = $this->pdo->prepare('DELETE FROM DbMockLibraryTest.testTable WHERE `id` = 0');
         $stmt->execute();
@@ -48,8 +57,9 @@ class DeleteTest extends TestCase
 
     /**
      * @return void
+     * @throws ReflectionException
      */
-    public function test_function()
+    public function test_function(): void
     {
         // prepare
         $stmt = $this->pdo->prepare('SELECT * FROM `DbMockLibraryTest`.testTable WHERE `id` = 0');

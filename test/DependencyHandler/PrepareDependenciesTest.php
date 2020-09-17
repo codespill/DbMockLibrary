@@ -1,19 +1,25 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\DependencyHandler;
 
 use DbMockLibrary\DependencyHandler;
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
 use DbMockLibrary\Test\TestCase;
+use ReflectionClass;
+use ReflectionException;
 
 class PrepareDependenciesTest extends TestCase
 {
     /**
      * @return void
+     * @throws AlreadyInitializedException
+     * @throws ReflectionException
      */
-    public function test_function()
+    public function test_function(): void
     {
         // prepare
-        $wanted       = ['a' => ['a1']];
-        $data         = [
+        $wanted = ['a' => ['a1']];
+        $data = [
             'a' => [
                 'a1' => [
                     'aa1' => 1,
@@ -58,19 +64,19 @@ class PrepareDependenciesTest extends TestCase
         $dependencies = [
             [
                 DependencyHandler::DEPENDENT => ['b' => 'bb1'],
-                DependencyHandler::ON        => ['d' => 'dd1']
+                DependencyHandler::ON => ['d' => 'dd1']
             ],
             [
                 DependencyHandler::DEPENDENT => ['a' => 'aa1'],
-                DependencyHandler::ON        => ['c' => 'cc1']
+                DependencyHandler::ON => ['c' => 'cc1']
             ],
             [
                 DependencyHandler::DEPENDENT => ['c' => 'cc2'],
-                DependencyHandler::ON        => ['d' => 'dd2']
+                DependencyHandler::ON => ['d' => 'dd2']
             ],
             [
                 DependencyHandler::DEPENDENT => ['a' => 'aa1'],
-                DependencyHandler::ON        => ['b' => 'bb1']
+                DependencyHandler::ON => ['b' => 'bb1']
             ],
         ];
         $expected = [
@@ -80,7 +86,7 @@ class PrepareDependenciesTest extends TestCase
             ['a' => ['a1']]
         ];
         DependencyHandler::initDependencyHandler($data, $dependencies);
-        $reflection         = new \ReflectionClass('\DbMockLibrary\DependencyHandler');
+        $reflection = new ReflectionClass(DependencyHandler::class);
         $dependenciesMethod = $reflection->getMethod('prepareDependencies');
         $dependenciesMethod->setAccessible(true);
 

@@ -1,18 +1,23 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\MockDataManipulation;
 
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
 use DbMockLibrary\MockDataManipulation;
 use DbMockLibrary\Test\TestCase;
+use UnexpectedValueException;
 
 class DropCollectionsXTest extends TestCase
 {
     /**
      * @return void
+     * @throws AlreadyInitializedException
      */
-    public function test_function()
+    public function test_function(): void
     {
         // prepare
-        $this->setExpectedException('\UnexpectedValueException', 'Collection \'fooBar\' does not exist');
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Collection \'fooBar\' does not exist');
         MockDataManipulation::initDataContainer(['collection' => []]);
 
         // invoke logic & test

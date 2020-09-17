@@ -1,20 +1,28 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\DependencyHandler;
 
 use DbMockLibrary\DependencyHandler;
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
 use DbMockLibrary\Test\TestCase;
+use ReflectionClass;
+use ReflectionException;
+use UnexpectedValueException;
 
 class ExtractDependenciesXTest extends TestCase
 {
     /**
      * @return void
+     * @throws AlreadyInitializedException
+     * @throws ReflectionException
      */
-    public function test_function()
+    public function test_function(): void
     {
         // prepare
-        $this->setExpectedException('\UnexpectedValueException', 'Dependency missing. Expected: "a1", found: "" in a on c dependency');
-        $wanted       = ['a' => ['a1']];
-        $data         = [
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Dependency missing. Expected: "a1", found: "" in a on c dependency');
+        $wanted = ['a' => ['a1']];
+        $data = [
             'a' => [
                 'a1' => [
                     'aa1' => 1,
@@ -59,22 +67,22 @@ class ExtractDependenciesXTest extends TestCase
         $dependencies = [
             [
                 DependencyHandler::DEPENDENT => ['b' => 'bb1'],
-                DependencyHandler::ON        => ['d' => 'dd1']
+                DependencyHandler::ON => ['d' => 'dd1']
             ],
             [
                 DependencyHandler::DEPENDENT => ['a' => 'aa1'],
-                DependencyHandler::ON        => ['c' => 'cc1']
+                DependencyHandler::ON => ['c' => 'cc1']
             ],
             [
                 DependencyHandler::DEPENDENT => ['c' => 'cc2'],
-                DependencyHandler::ON        => ['d' => 'dd2']
+                DependencyHandler::ON => ['d' => 'dd2']
             ],
             [
                 DependencyHandler::DEPENDENT => ['a' => 'aa1'],
-                DependencyHandler::ON        => ['b' => 'bb1']
+                DependencyHandler::ON => ['b' => 'bb1']
             ],
         ];
-        $expected     = [
+        $expected = [
             [
                 'a' => [
                     'a1'
@@ -103,7 +111,7 @@ class ExtractDependenciesXTest extends TestCase
             ]
         ];
         DependencyHandler::initDependencyHandler($data, $dependencies);
-        $reflection         = new \ReflectionClass('\DbMockLibrary\DependencyHandler');
+        $reflection = new ReflectionClass(DependencyHandler::class);
         $dependenciesMethod = $reflection->getMethod('extractDependencies');
         $dependenciesMethod->setAccessible(true);
 

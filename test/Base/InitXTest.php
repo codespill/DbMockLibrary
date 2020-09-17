@@ -1,18 +1,21 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\Base;
 
 use DbMockLibrary\Base;
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
 use DbMockLibrary\Test\TestCase;
 
 class InitXTest extends TestCase
 {
     /**
-     * @return void
+     * @throws AlreadyInitializedException
      */
-    public function test_function()
+    public function test_function(): void
     {
         // prepare
-        $this->setExpectedException('\DbMockLibrary\Exceptions\AlreadyInitializedException', 'DbMockLibrary\Base has already been initialized');
+        $this->expectException(AlreadyInitializedException::class);
+        $this->expectExceptionMessage('DbMockLibrary\Base has already been initialized');
 
         // invoke logic
         Base::init();

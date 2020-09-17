@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace DbMockLibrary;
 
@@ -15,17 +15,16 @@ class DependencyHandler extends MockDataManipulation
     /**
      * @var array $dependencies
      */
-    protected $dependencies;
+    protected array $dependencies;
 
     /**
      * @param array $initialData
-     *
      * @param array $dependencies
      *
+     * @return void
      * @throws AlreadyInitializedException
-     * @throws InvalidDependencyException
      */
-    public static function initDependencyHandler(array $initialData, array $dependencies = [])
+    public static function initDependencyHandler(array $initialData, array $dependencies = []): void
     {
         static::init();
         static::$instance->data = static::$initialData = $initialData;
@@ -41,7 +40,7 @@ class DependencyHandler extends MockDataManipulation
      *
      * @return array
      */
-    protected function extractDependencies(array $wanted, $extracted = [])
+    protected function extractDependencies(array $wanted, array $extracted = []): array
     {
         $extracted = empty($extracted) ? [$wanted] : $extracted;
         foreach ($wanted as $dependentCollection => $dependentIds) {
@@ -82,7 +81,7 @@ class DependencyHandler extends MockDataManipulation
      *
      * @return array
      */
-    protected function repackDependencies(array $extracted)
+    protected function repackDependencies(array $extracted): array
     {
         if (SimpleArrayLibrary::countMaxDepth($extracted) != 3 || SimpleArrayLibrary::countMinDepth($extracted) != 3) {
             throw new UnexpectedValueException('Invalid input');
@@ -108,7 +107,7 @@ class DependencyHandler extends MockDataManipulation
      *
      * @return array
      */
-    protected function compactDependencies(array $repacked)
+    protected function compactDependencies(array $repacked): array
     {
         if (SimpleArrayLibrary::countMaxDepth($repacked) != 2 || SimpleArrayLibrary::countMinDepth($repacked) != 2) {
             throw new UnexpectedValueException('Invalid input');
@@ -132,7 +131,7 @@ class DependencyHandler extends MockDataManipulation
      *
      * @return array
      */
-    protected function prepareDependencies(array $wanted)
+    protected function prepareDependencies(array $wanted): array
     {
         $return = $this->extractDependencies($wanted);
         $return = $this->repackDependencies($return);
@@ -146,7 +145,7 @@ class DependencyHandler extends MockDataManipulation
      * @return void
      * @throws InvalidDependencyException
      */
-    protected function validate(array $dependencies)
+    protected function validate(array $dependencies): void
     {
         foreach ($dependencies as $dependency) {
             $dependentCollection = key($tmp = $dependency[static::DEPENDENT]);

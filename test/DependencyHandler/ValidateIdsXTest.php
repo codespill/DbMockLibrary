@@ -1,8 +1,13 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\DependencyHandler;
 
 use DbMockLibrary\DependencyHandler;
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
+use DbMockLibrary\Exceptions\InvalidDependencyException;
 use DbMockLibrary\Test\TestCase;
+use ReflectionClass;
+use ReflectionException;
 
 class ValidateIdsXTest extends TestCase
 {
@@ -12,13 +17,16 @@ class ValidateIdsXTest extends TestCase
      * @param array $data
      *
      * @return void
+     * @throws AlreadyInitializedException
+     * @throws ReflectionException
      */
-    public function test_function(array $data)
+    public function test_function(array $data): void
     {
         // prepare
-        $this->setExpectedException('DbMockLibrary\Exceptions\InvalidDependencyException', $data['errorMessage']);
+        $this->expectException(InvalidDependencyException::class);
+        $this->expectExceptionMessage($data['errorMessage']);
         DependencyHandler::initDependencyHandler($data['data']);
-        $reflection                = new \ReflectionClass(DependencyHandler::getInstance());
+        $reflection = new ReflectionClass(DependencyHandler::getInstance());
         $validateCollectionsMethod = $reflection->getMethod('validate');
         $validateCollectionsMethod->setAccessible(true);
 
@@ -29,9 +37,9 @@ class ValidateIdsXTest extends TestCase
     /**
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
-        $dataArray    = [
+        $dataArray = [
             'foo1' => [
                 'bar1' => [
                     'baz1' => 1
@@ -49,11 +57,11 @@ class ValidateIdsXTest extends TestCase
             [
                 [
                     'errorMessage' => 'Collection "foo11" does not exist',
-                    'data'         => $dataArray,
+                    'data' => $dataArray,
                     'dependencies' => [
                         [
                             DependencyHandler::DEPENDENT => ['foo11' => 'baz1'],
-                            DependencyHandler::ON        => ['foo2' => 'baz2']
+                            DependencyHandler::ON => ['foo2' => 'baz2']
                         ]
                     ]
                 ]
@@ -62,11 +70,11 @@ class ValidateIdsXTest extends TestCase
             [
                 [
                     'errorMessage' => 'Column "baz11" does not exist in one of the rows in a collection "foo1"',
-                    'data'         => $dataArray,
+                    'data' => $dataArray,
                     'dependencies' => [
                         [
                             DependencyHandler::DEPENDENT => ['foo1' => 'baz11'],
-                            DependencyHandler::ON        => ['foo2' => 'baz2']
+                            DependencyHandler::ON => ['foo2' => 'baz2']
                         ]
                     ]
                 ]
@@ -75,11 +83,11 @@ class ValidateIdsXTest extends TestCase
             [
                 [
                     'errorMessage' => 'Collection "foo22" does not exist',
-                    'data'         => $dataArray,
+                    'data' => $dataArray,
                     'dependencies' => [
                         [
                             DependencyHandler::DEPENDENT => ['foo1' => 'baz1'],
-                            DependencyHandler::ON        => ['foo22' => 'baz2']
+                            DependencyHandler::ON => ['foo22' => 'baz2']
                         ]
                     ]
                 ]
@@ -88,11 +96,11 @@ class ValidateIdsXTest extends TestCase
             [
                 [
                     'errorMessage' => 'Column "baz22" does not exist in one of the rows in a collection "foo2"',
-                    'data'         => $dataArray,
+                    'data' => $dataArray,
                     'dependencies' => [
                         [
                             DependencyHandler::DEPENDENT => ['foo1' => 'baz1'],
-                            DependencyHandler::ON        => ['foo2' => 'baz22']
+                            DependencyHandler::ON => ['foo2' => 'baz22']
                         ]
                     ]
                 ]
@@ -101,15 +109,15 @@ class ValidateIdsXTest extends TestCase
             [
                 [
                     'errorMessage' => 'Collection: "foo1" depends on itself via "foo2" collection',
-                    'data'         => $dataArray,
+                    'data' => $dataArray,
                     'dependencies' => [
                         [
                             DependencyHandler::DEPENDENT => ['foo1' => 'baz1'],
-                            DependencyHandler::ON        => ['foo2' => 'baz2']
+                            DependencyHandler::ON => ['foo2' => 'baz2']
                         ],
                         [
                             DependencyHandler::DEPENDENT => ['foo2' => 'baz2'],
-                            DependencyHandler::ON        => ['foo1' => 'baz1']
+                            DependencyHandler::ON => ['foo1' => 'baz1']
                         ]
                     ]
                 ]

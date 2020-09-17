@@ -1,6 +1,8 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\MockDataManipulation;
 
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
 use DbMockLibrary\MockDataManipulation;
 use DbMockLibrary\Test\TestCase;
 
@@ -12,8 +14,9 @@ class GetCollectionElementsTest extends TestCase
      * @param array $data
      *
      * @return void
+     * @throws AlreadyInitializedException
      */
-    public function test_function(array $data)
+    public function test_function(array $data): void
     {
         // prepare
         MockDataManipulation::initDataContainer(['collection' => ['id' => [1]]]);
@@ -28,23 +31,23 @@ class GetCollectionElementsTest extends TestCase
     /**
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return [
             // #0 collection element found
             [
                 [
-                    'id'         => 'id',
+                    'id' => 'id',
                     'collection' => 'collection',
-                    'expected'   => [1]
+                    'expected' => [1]
                 ]
             ],
             // #1 collection found
             [
                 [
-                    'id'         => false,
+                    'id' => null,
                     'collection' => 'collection',
-                    'expected'   => ['id' => [1]]
+                    'expected' => ['id' => [1]]
                 ]
             ]
         ];

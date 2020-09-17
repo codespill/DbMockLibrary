@@ -1,8 +1,12 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\MockDataManipulation;
 
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
 use DbMockLibrary\MockDataManipulation;
 use DbMockLibrary\Test\TestCase;
+use ReflectionClass;
+use ReflectionException;
 
 class RevertCollectionsTest extends TestCase
 {
@@ -12,20 +16,23 @@ class RevertCollectionsTest extends TestCase
      * @param array $data
      *
      * @return void
+     * @throws AlreadyInitializedException
+     * @throws ReflectionException
      */
-    public function test_function(array $data)
+    public function test_function(array $data): void
     {
         // prepare
         MockDataManipulation::initDataContainer([
-            'collection1' => ['id1' => [1], 'id2' => [2]], 'collection2' => ['id3' => [1], 'id4' => [2]]
+            'collection1' => ['id1' => [1], 'id2' => [2]],
+            'collection2' => ['id3' => [1], 'id4' => [2]]
         ]);
-        $reflection   = new \ReflectionClass('\DbMockLibrary\MockDataManipulation');
+        $reflection = new ReflectionClass(MockDataManipulation::class);
         $dataProperty = $reflection->getProperty('data');
         $dataProperty->setAccessible(true);
         if (!empty($data['newCollection'])) {
             $dataProperty->setValue(MockDataManipulation::getInstance(), [
-                'collection1'   => [],
-                'collection2'   => [],
+                'collection1' => [],
+                'collection2' => [],
                 'newCollection' => $data['newCollection']
             ]);
         } else {
@@ -42,29 +49,32 @@ class RevertCollectionsTest extends TestCase
     /**
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return [
             // #0 revert selected collections
             [
                 [
                     'collections' => ['collection2'],
-                    'expected'    => ['collection1' => [], 'collection2' => ['id3' => [1], 'id4' => [2]]]
+                    'expected' => ['collection1' => [], 'collection2' => ['id3' => [1], 'id4' => [2]]]
                 ]
             ],
             // #1 revert all collections
             [
                 [
                     'collections' => [],
-                    'expected'    => ['collection1' => ['id1' => [1], 'id2' => [2]], 'collection2' => ['id3' => [1], 'id4' => [2]]]
+                    'expected' => [
+                        'collection1' => ['id1' => [1], 'id2' => [2]],
+                        'collection2' => ['id3' => [1], 'id4' => [2]]
+                    ]
                 ]
             ],
             // #2 collection that wasn't in initial data is dropped
             [
                 [
-                    'collections'   => ['newCollection'],
+                    'collections' => ['newCollection'],
                     'newCollection' => ['id1' => [1], 'id2' => [2]],
-                    'expected'      => ['collection1' => [], 'collection2' => []]
+                    'expected' => ['collection1' => [], 'collection2' => []]
                 ]
             ]
         ];

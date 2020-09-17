@@ -1,15 +1,21 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\DependencyHandler;
 
 use DbMockLibrary\DependencyHandler;
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
 use DbMockLibrary\Test\TestCase;
+use ReflectionClass;
+use ReflectionException;
 
 class RepackDependenciesTest extends TestCase
 {
     /**
      * @return void
+     * @throws AlreadyInitializedException
+     * @throws ReflectionException
      */
-    public function test_function()
+    public function test_function(): void
     {
         // prepare
         $extracted = [
@@ -57,7 +63,7 @@ class RepackDependenciesTest extends TestCase
             ]
         ];
         DependencyHandler::initDependencyHandler([]);
-        $reflection = new \ReflectionClass('\DbMockLibrary\DependencyHandler');
+        $reflection = new ReflectionClass(DependencyHandler::class);
         $dependenciesMethod = $reflection->getMethod('repackDependencies');
         $dependenciesMethod->setAccessible(true);
 

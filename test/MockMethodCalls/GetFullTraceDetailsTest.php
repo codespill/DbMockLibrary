@@ -1,8 +1,12 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\MockMethodCalls;
 
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
 use DbMockLibrary\MockMethodCalls;
 use DbMockLibrary\Test\TestCase;
+use ReflectionClass;
+use ReflectionException;
 
 class GetFullTraceDetailsTest extends TestCase
 {
@@ -12,22 +16,24 @@ class GetFullTraceDetailsTest extends TestCase
      * @param array $data
      *
      * @return void
+     * @throws AlreadyInitializedException
+     * @throws ReflectionException
      */
-    public function test_function(array $data)
+    public function test_function(array $data): void
     {
         // prepare
         MockMethodCalls::init();
         $traces = [
             [
                 [
-                    'function'  => 'getMessage',
-                    'class'     => 'Exception',
-                    'args'      => ['fooBar'],
-                    'foo'       => 'bar'
+                    'function' => 'getMessage',
+                    'class' => 'Exception',
+                    'args' => ['fooBar'],
+                    'foo' => 'bar'
                 ]
             ]
         ];
-        $reflection    = new \ReflectionClass('\DbMockLibrary\MockMethodCalls');
+        $reflection = new ReflectionClass(MockMethodCalls::class);
         $traceProperty = $reflection->getProperty('traces');
         $traceProperty->setAccessible(true);
         $traceProperty->setValue(MockMethodCalls::getInstance(), $traces);
@@ -44,20 +50,20 @@ class GetFullTraceDetailsTest extends TestCase
     /**
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return [
             // #0 method was called
             [
                 [
-                    'class'     => 'Exception',
-                    'method'    => 'getMessage',
-                    'expected'  => [
+                    'class' => 'Exception',
+                    'method' => 'getMessage',
+                    'expected' => [
                         [
                             [
-                                'function'  => 'getMessage',
-                                'class'     => 'Exception',
-                                'args'      => ['fooBar']
+                                'function' => 'getMessage',
+                                'class' => 'Exception',
+                                'args' => ['fooBar']
                             ]
                         ]
                     ]
@@ -66,9 +72,9 @@ class GetFullTraceDetailsTest extends TestCase
             // #1 method wasn't called
             [
                 [
-                    'class'     => 'Exception',
-                    'method'    => 'getTrace',
-                    'expected'  => []
+                    'class' => 'Exception',
+                    'method' => 'getTrace',
+                    'expected' => []
                 ]
             ]
         ];

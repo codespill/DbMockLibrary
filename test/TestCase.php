@@ -1,30 +1,45 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace DbMockLibrary\Test;
 
+use DbMockLibrary\Base;
+use DbMockLibrary\DataContainer;
+use DbMockLibrary\DbImplementations\Mongo;
+use DbMockLibrary\DbImplementations\MySQL;
+use DbMockLibrary\DependencyHandler;
+use DbMockLibrary\MockMethodCalls;
 use InvalidArgumentException;
 use Mockery;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 use ReflectionClass;
+use ReflectionException;
 
-class TestCase extends PHPUnit_Framework_TestCase
+class TestCase extends PHPUnitTestCase
 {
-    public function tearDown()
+    protected function setUp(): void
+    {
+        parent::setUp();
+    }
+
+    /**
+     * @return void
+     * @throws ReflectionException
+     */
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         Mockery::close();
 
         $reflections = [
-            new ReflectionClass('\DbMockLibrary\Base'),
-            new ReflectionClass('\DbMockLibrary\MockMethodCalls'),
-            new ReflectionClass('\DbMockLibrary\DataContainer'),
-            new ReflectionClass('\DbMockLibrary\DependencyHandler'),
-            new ReflectionClass('\DbMockLibrary\DbImplementations\Mongo'),
-            new ReflectionClass('\DbMockLibrary\DbImplementations\MySQL')
+            new ReflectionClass(Base::class),
+            new ReflectionClass(MockMethodCalls::class),
+            new ReflectionClass(DataContainer::class),
+            new ReflectionClass(DependencyHandler::class),
+            new ReflectionClass(Mongo::class),
+            new ReflectionClass(MySQL::class)
         ];
 
-        /* @var $reflection ReflectionClass */
         foreach ($reflections as $reflection) {
             $staticProperties = $reflection->getStaticProperties();
             if (!is_null($staticProperties['instance'])) {
@@ -43,8 +58,9 @@ class TestCase extends PHPUnit_Framework_TestCase
      *
      * @return void
      * @throws InvalidArgumentException
+     * @throws ReflectionException
      */
-    public function setPropertyByReflection($class, $property, $value)
+    public function setPropertyByReflection($class, $property, $value): void
     {
         if (
             !is_object($class)
@@ -71,6 +87,7 @@ class TestCase extends PHPUnit_Framework_TestCase
      *
      * @return mixed
      * @throws InvalidArgumentException
+     * @throws ReflectionException
      */
     public function getPropertyByReflection($class, $property)
     {
@@ -101,6 +118,7 @@ class TestCase extends PHPUnit_Framework_TestCase
      *
      * @return mixed
      * @throws InvalidArgumentException
+     * @throws ReflectionException
      */
     public function invokeMethodByReflection($class, $method, array $arguments)
     {

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace DbMockLibrary;
 
@@ -11,12 +11,12 @@ class MockDataManipulation extends DataContainer
      * Deletes the record from the collection
      *
      * @param string $collection
-     * @param array  $ids
+     * @param array $ids
      *
      * @return void
      * @throws UnexpectedValueException
      */
-    public function deleteRow($collection, array $ids)
+    public function deleteRow(string $collection, array $ids): void
     {
         $this->validateIds($collection, $ids);
 
@@ -32,7 +32,7 @@ class MockDataManipulation extends DataContainer
      *
      * @return void
      */
-    public function dropCollections(array $collections = [])
+    public function dropCollections(array $collections = []): void
     {
         $this->validateCollections($collections);
 
@@ -48,7 +48,7 @@ class MockDataManipulation extends DataContainer
      *
      * @return array
      */
-    protected function getAllCollectionsIfEmpty(array $collections)
+    protected function getAllCollectionsIfEmpty(array $collections): array
     {
         if (empty($collections)) {
             $collections = array_keys($this->data);
@@ -61,11 +61,11 @@ class MockDataManipulation extends DataContainer
      * Returns keys of a collection or all collections, or empty array for invalid collection
      *
      * @param array $collections
-     * @param bool  $byCollection
+     * @param bool $byCollection
      *
      * @return array
      */
-    public function getAllIds(array $collections = [], $byCollection = false)
+    public function getAllIds(array $collections = [], bool $byCollection = false): array
     {
         $this->validateCollections($collections);
 
@@ -86,15 +86,14 @@ class MockDataManipulation extends DataContainer
     /**
      * Return collection data
      *
-     * @param string      $collection
-     * @param string|bool $id
+     * @param string $collection
+     * @param string|null $id
      *
-     * @throws UnexpectedValueException
-     * @return mixed|array
+     * @return array
      */
-    public function getCollectionElements($collection, $id = false)
+    public function getCollectionElements(string $collection, ?string $id = null): array
     {
-        if ($id === false) {
+        if ($id === null) {
             $this->validateCollections([$collection]);
             $return = $this->data[$collection];
         } else {
@@ -110,10 +109,10 @@ class MockDataManipulation extends DataContainer
      *
      * @param array $collections
      *
-     * @throws UnexpectedValueException
      * @return void
+     * @throws UnexpectedValueException
      */
-    public function revertCollections(array $collections = [])
+    public function revertCollections(array $collections = []): void
     {
         $this->validateCollections($collections);
 
@@ -136,7 +135,7 @@ class MockDataManipulation extends DataContainer
      *
      * @return void
      */
-    public function saveCollection($value, $collection)
+    public function saveCollection($value, $collection): void
     {
         $this->saveData($value, $collection);
     }
@@ -145,13 +144,13 @@ class MockDataManipulation extends DataContainer
      * Edits $data array
      *
      * @param array|string $value
-     * @param string       $collection
-     * @param string       $id
-     * @param string       $field
+     * @param string $collection
+     * @param string $id
+     * @param string $field
      *
      * @return void
      */
-    public function saveData($value, $collection = '', $id = '', $field = '')
+    public function saveData($value, $collection = '', $id = '', $field = ''): void
     {
         if (!empty($collection)) {
             if (!empty($id) || $id === 0 || $id === '0') {
@@ -198,7 +197,7 @@ class MockDataManipulation extends DataContainer
      *
      * @return void
      */
-    public function saveField($value, $collection, $id, $field)
+    public function saveField($value, $collection, $id, $field): void
     {
         $this->saveData($value, $collection, $id, $field);
     }
@@ -212,7 +211,7 @@ class MockDataManipulation extends DataContainer
      *
      * @return void
      */
-    public function saveRow($value, $collection, $id)
+    public function saveRow($value, $collection, $id): void
     {
         $this->saveData($value, $collection, $id);
     }
@@ -222,10 +221,10 @@ class MockDataManipulation extends DataContainer
      *
      * @param array $collections
      *
-     * @throws UnexpectedValueException
      * @return void
+     * @throws UnexpectedValueException
      */
-    public function truncateCollections(array $collections = [])
+    public function truncateCollections(array $collections = []): void
     {
         $this->validateCollections($collections);
 

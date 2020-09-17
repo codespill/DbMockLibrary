@@ -1,7 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
+namespace DbMockLibrary\Test\MockMethodCalls;
+
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
 use DbMockLibrary\MockMethodCalls;
 use DbMockLibrary\Test\TestCase;
+use ReflectionException;
 
 class GetCallArgumentsTest extends TestCase
 {
@@ -9,8 +13,10 @@ class GetCallArgumentsTest extends TestCase
      * Test function
      *
      * @return void
+     * @throws AlreadyInitializedException
+     * @throws ReflectionException
      */
-    public function test_function()
+    public function test_function(): void
     {
         // prepare
         MockMethodCalls::init();

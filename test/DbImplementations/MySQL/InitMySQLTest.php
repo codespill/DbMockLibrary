@@ -1,21 +1,25 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\DbImplementations\MySQL;
 
 use DbMockLibrary\DbImplementations\MySQL;
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
+use DbMockLibrary\Exceptions\InvalidDependencyException;
 use DbMockLibrary\Test\TestCase;
+use PDO;
+use ReflectionClass;
+use ReflectionException;
 
-class InitTest extends TestCase
+class InitMySQLTest extends TestCase
 {
-    /**
-     * @var \PDO $pdo
-     */
-    protected $pdo;
+    protected PDO $pdo;
 
-    public function setUp()
+    /**
+     * @return void
+     */
+    protected function setUp(): void
     {
-        if (is_null($this->pdo)) {
-            $this->pdo = new \PDO('mysql:host=localhost;', 'root', '');
-        }
+        $this->pdo ??= new PDO('mysql:host=127.0.0.1;', 'root', '');
 
         $stmt = $this->pdo->prepare('DROP DATABASE IF EXISTS `DbMockLibraryTest`');
         $stmt->execute();
@@ -27,7 +31,10 @@ class InitTest extends TestCase
         $stmt->execute();
     }
 
-    public function tearDown()
+    /**
+     * @return void
+     */
+    protected function tearDown(): void
     {
         $stmt = $this->pdo->prepare('DROP DATABASE IF EXISTS `DbMockLibraryTest`');
         $stmt->execute();
@@ -37,21 +44,24 @@ class InitTest extends TestCase
 
     /**
      * @return void
+     * @throws AlreadyInitializedException
+     * @throws InvalidDependencyException
+     * @throws ReflectionException
      */
-    public function test_function()
+    public function test_function(): void
     {
         // prepare
         $dataArray = ['testTable' => [1 => ['foo' => 1, 'id' => 1]]];
 
         // invoke logic
-        MySQL::initMySQL($dataArray, 'localhost', 'DbMockLibraryTest', 'root', '', []);
+        MySQL::initMySQL($dataArray, '127.0.0.1', 'DbMockLibraryTest', 'root', '', []);
 
         // prepare
-        $reflection = new \ReflectionClass('\DbMockLibrary\DbImplementations\MySQL');
+        $reflection = new ReflectionClass(MySQL::class);
         $staticProperties = $reflection->getStaticProperties();
 
         // test
-        $this->assertInstanceOf('\DbMockLibrary\DbImplementations\MySQL', $staticProperties['instance']);
+        $this->assertInstanceOf(MySQL::class, $staticProperties['instance']);
         $this->assertEquals($dataArray, $staticProperties['initialData']);
 
         // prepare

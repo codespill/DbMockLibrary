@@ -1,8 +1,10 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\AbstractImplementation;
 
 use DbMockLibrary\DependencyHandler;
 use DbMockLibrary\MockMethodCalls;
+use ReflectionException;
 
 class SetUpTest extends FakeTestCase
 {
@@ -10,8 +12,9 @@ class SetUpTest extends FakeTestCase
      * @dataProvider getData
      *
      * @return void
+     * @throws ReflectionException
      */
-    public function test_function(array $data)
+    public function test_function(array $data): void
     {
         // prepare
         $this->setPropertyByReflection($this->fake, 'data', $data['data']);
@@ -23,7 +26,7 @@ class SetUpTest extends FakeTestCase
         // test
         foreach ($data['arguments'] as $key => $arguments) {
             $this->assertEquals(1, MockMethodCalls::getInstance()->wasCalledCount(
-                'DbMockLibrary\Test\AbstractImplementation\FakeImplementation',
+                FakeImplementation::class,
                 'insert',
                 $arguments
             ));

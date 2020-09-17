@@ -1,24 +1,32 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DbMockLibrary\Test\DependencyHandler;
 
 use DbMockLibrary\DependencyHandler;
+use DbMockLibrary\Exceptions\AlreadyInitializedException;
 use DbMockLibrary\Test\TestCase;
+use ReflectionClass;
+use ReflectionException;
+use UnexpectedValueException;
 
 class RepackDependenciesXTest extends TestCase
 {
     /**
-     * @param array $data
-     *
      * @dataProvider getData
      *
+     * @param array $data
+     *
      * @return void
+     * @throws AlreadyInitializedException
+     * @throws ReflectionException
      */
-    public function test_function(array $data)
+    public function test_function(array $data): void
     {
         // prepare
-        $this->setExpectedException('\UnexpectedValueException', 'Invalid input');
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Invalid input');
         DependencyHandler::initDependencyHandler([]);
-        $reflection         = new \ReflectionClass('\DbMockLibrary\DependencyHandler');
+        $reflection = new ReflectionClass(DependencyHandler::class);
         $dependenciesMethod = $reflection->getMethod('repackDependencies');
         $dependenciesMethod->setAccessible(true);
 
@@ -29,7 +37,7 @@ class RepackDependenciesXTest extends TestCase
     /**
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return [
             // #0 dimension 2, should be 3
