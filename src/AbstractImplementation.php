@@ -95,29 +95,29 @@ abstract class AbstractImplementation extends DependencyHandler
      * Insert into database
      *
      * @param string $collection
-     * @param string $id
+     * @param $id
      *
      * @return void
      */
-    abstract protected function insert(string $collection, string $id): void;
+    abstract protected function insert(string $collection, $id): void;
 
     /**
      * Delete from database
      *
      * @param string $collection
-     * @param string $id
+     * @param $id
      *
      * @return void
      */
-    abstract protected function delete(string $collection, string $id): void;
+    abstract protected function delete(string $collection, $id): void;
 
     /**
      * @param string $collection
-     * @param string $id
+     * @param $id
      *
      * @return void
      */
-    protected function recordInsert(string $collection, string $id): void
+    protected function recordInsert(string $collection, $id): void
     {
         if (!in_array([$collection => $id], $this->insertedIntoDb)) {
             $this->insertedIntoDb[] = [$collection => $id];

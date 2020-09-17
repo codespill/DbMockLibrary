@@ -89,12 +89,12 @@ class MySQL extends AbstractImplementation
      * Insert into database
      *
      * @param string $collection
-     * @param string $id
+     * @param $id
      *
      * @return void
      * @throws DbOperationFailedException
      */
-    protected function insert(string $collection, string $id): void
+    protected function insert(string $collection, $id): void
     {
         $data = $this->data[$collection][$id];
         $columns = array_map(function ($value) {
@@ -114,12 +114,12 @@ class MySQL extends AbstractImplementation
      * Delete from database
      *
      * @param string $collection
-     * @param string $id
+     * @param $id
      *
      * @return void
      * @throws DbOperationFailedException
      */
-    protected function delete(string $collection, string $id): void
+    protected function delete(string $collection, $id): void
     {
         $query = 'DELETE FROM ' . $collection . ' WHERE ';
         $conditions = [];

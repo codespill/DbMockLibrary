@@ -11,11 +11,11 @@ class FakeImplementation extends AbstractImplementation
      * Insert into database
      *
      * @param string $collection
-     * @param string $id
+     * @param $id
      *
      * @return void
      */
-    protected function insert(string $collection, string $id): void
+    protected function insert(string $collection, $id): void
     {
         MockMethodCalls::getInstance()->recordTrace();
     }
@@ -24,11 +24,11 @@ class FakeImplementation extends AbstractImplementation
      * Delete from database
      *
      * @param string $collection
-     * @param string $id
+     * @param $id
      *
      * @return void
      */
-    protected function delete(string $collection, string $id): void
+    protected function delete(string $collection, $id): void
     {
         MockMethodCalls::getInstance()->recordTrace();
     }

@@ -69,12 +69,12 @@ class Mongo extends AbstractImplementation
      * Insert into database
      *
      * @param string $collectionName
-     * @param string $id
+     * @param $id
      *
      * @return void
      * @throws DbOperationFailedException
      */
-    protected function insert(string $collectionName, string $id): void
+    protected function insert(string $collectionName, $id): void
     {
         $collection = static::$instance->database->selectCollection($collectionName);
         try {
@@ -92,12 +92,12 @@ class Mongo extends AbstractImplementation
      * Delete from database
      *
      * @param string $collectionName
-     * @param string $id
+     * @param $id
      *
      * @return void
      * @throws DbOperationFailedException
      */
-    protected function delete(string $collectionName, string $id): void
+    protected function delete(string $collectionName, $id): void
     {
         $collection = static::$instance->database->selectCollection($collectionName);
         try {
