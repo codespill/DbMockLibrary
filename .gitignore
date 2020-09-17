@@ -2,3 +2,4 @@
 vendor/
 /index.php
 /test/.phpunit.result.cache
+build/

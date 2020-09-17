@@ -10,13 +10,15 @@
   "description": "Db mocking & dummy data management library",
   "homepage": "https://github.com/ajant/DbMockLibrary",
   "require": {
-    "php": ">=7.4",
+    "php": ">=7.1",
     "ajant/simple-array-library": ">=2",
     "mongodb/mongodb": "~1.7.0"
   },
   "require-dev": {
+    "php": ">=7.4",
     "phpunit/phpunit": ">=9",
-    "mockery/mockery": "^1.4"
+    "mockery/mockery": "^1.4",
+    "php-coveralls/php-coveralls": "^2.2"
   },
   "autoload": {
     "psr-4": {
@@ -29,6 +31,7 @@
     }
   },
   "scripts": {
-    "test-u": "vendor/bin/phpunit -c test/phpunit.xml test"
+    "test-u": "vendor/bin/phpunit -c test/phpunit.xml test",
+    "test-coverage-u": "vendor/bin/phpunit --coverage-clover build/logs/clover.xml -v -c test/phpunit.xml test"
   }
 }
