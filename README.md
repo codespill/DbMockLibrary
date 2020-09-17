@@ -45,7 +45,7 @@ Installation
 ============
 Install the latest version with composer:<br/>
 ```
-require "ajant/db-mock-library": ~1
+require "ajant/db-mock-library": ~3
 ```
 
 Auto-load the library:
@@ -81,7 +81,7 @@ $dependencies = [
     ]
 ];
 // initialize MySQL
-MySQL::initMySQL($data, 'localhost', 'DbMockLibraryTest', 'root', '', $dependencies);
+MySQL::initMySQL($data, '127.0.0.1', 'DbMockLibraryTest', 'root', '', $dependencies);
 ...
 ```
 Test set up:
