@@ -34,7 +34,7 @@ some of the most popular databases
 Requirements
 ============
 
-You'll need: PHP version 7.1+
+You'll need: PHP version 7.2+
 
 Requirements (dev)
 ============

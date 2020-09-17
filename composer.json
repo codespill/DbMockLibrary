@@ -10,7 +10,7 @@
   "description": "Db mocking & dummy data management library",
   "homepage": "https://github.com/ajant/DbMockLibrary",
   "require": {
-    "php": ">=7.1",
+    "php": ">=7.2",
     "ajant/simple-array-library": ">=2",
     "mongodb/mongodb": "~1.2.0"
   },
